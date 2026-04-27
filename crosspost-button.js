@@ -406,7 +406,7 @@
     if (platform === 'mercari') {
       console.log('Scraped listing data:', listing);
       await chrome.storage.local.set({ pendingListing: listing });
-      //chrome.runtime.sendMessage({ type: 'OPEN_TAB', url: 'https://www.mercari.com/sell/' });
+      chrome.runtime.sendMessage({ type: 'OPEN_TAB', url: 'https://www.mercari.com/sell/' });
       showToast('🚀', `Opening Mercari…\nYour listing data is ready to fill.`);
 
     } 

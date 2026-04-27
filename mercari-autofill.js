@@ -28,7 +28,8 @@
   // ─────────────────────────────────────────────
   chrome.storage.local.get(['pendingListing'], ({ pendingListing }) => {
     if (!pendingListing) return; // nothing to fill
-    chrome.storage.local.remove('pendingListing');
+    // Just dont unset it like wtf ai
+    //chrome.storage.local.remove('pendingListing');
     waitForForm(pendingListing);
   });
 
