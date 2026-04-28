@@ -677,13 +677,13 @@
 
       ${(listing.images?.length || listing.image) ? `
       <div id="mf-photo-drawer">
-        <div class="mf-photo-label">Your Poshmark Photos — right-click → Save to upload</div>
+        <div class="mf-photo-label">If photos don't show up here: Your Poshmark Photos — right-click → Save to upload</div>
         <div class="mf-photo-row">
           ${(listing.images || [listing.image]).filter(Boolean).slice(0, 10).map(
             src => `<img src="${esc(src)}" title="Right-click → Save image" draggable="true">`
           ).join('')}
         </div>
-        <div class="mf-photo-hint">📌 Photos can't be uploaded automatically. Save each image, then upload to Mercari manually.</div>
+        <div class="mf-photo-hint">📌 If photos can't be uploaded automatically. Save each image, then upload to Mercari manually.</div>
       </div>` : ''}
     `;
 

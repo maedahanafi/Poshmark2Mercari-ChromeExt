@@ -1,6 +1,6 @@
-# 🎯 Listing Selector — Chrome Extension
+# 🎯 Poshmark to Mercari Autofill — Chrome Extension
 
-Select any product/listing cards on any website and view them in a beautiful popup panel.
+Navigate to your Poshmark listing on a page and in a click of a button, import them into Mercari's selling form with all details and photos pre-filled.
 
 ## Install
 
@@ -12,26 +12,14 @@ Select any product/listing cards on any website and view them in a beautiful pop
 ## How to Use
 
 ### Manual Selection
-1. Visit any e-commerce or listing site (Poshmark, eBay, Etsy, Amazon, Craigslist, etc.)
-2. Click the extension icon → toggle **Selection Mode ON**
-3. The popup closes — hover over items on the page to see them highlighted
-4. **Click** any listing card to select it (orange outline + ✓ badge)
-5. Click again to deselect
-6. Open the extension popup → click **"View Selected Listings"**
-7. A beautiful modal appears with all your selected items, their images, prices, and links
+1. Visit your Poshmark listing.
+2. Click the button on the bottom right corner of the listing page. Refresh if it does not appear. 
+3. A new tab for Mercari's selling page will popup with the form autofilled with data from your Poshmark listing.
+4. Double check for inaccuracies before selling!
 
-### Auto-Detect
-- Click **Auto-Detect** in the popup to let the extension scan for listing-like elements and activate selection mode automatically
+### Viewing Scraped Data
+- Click the extension icon → Click on **Scrape**
 
-### Floating Toolbar
-- A floating toolbar appears at the bottom of the page once you've selected items
-- **View** — opens the modal directly from the page
-- **Clear** — deselects everything
+### Image Issues?
+- If the images do not upload, you must upload them from Poshmark manually.
 
-## Features
-- ✅ Works on any website — no site-specific configuration
-- ✅ Smart element detection (finds cards, articles, list items)
-- ✅ Extracts title, price, image, and URL automatically
-- ✅ Copy all listings as text with one click
-- ✅ Keyboard shortcut: `Esc` closes the modal
-- ✅ Staggered card animations in the popup modal

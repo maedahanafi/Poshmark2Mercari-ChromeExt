@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Listing Selector",
+  "name": "Poshmark to Mercari Autofill",
   "version": "1.0.0",
-  "description": "Select any listings on a page and view them in a beautiful popup panel",
+  "description": "Navigate to your Poshmark listing on a page and in a click of a button, import them into Mercari's selling form with all details and photos pre-filled.",
   "permissions": ["activeTab", "scripting", "storage"],
   "host_permissions": ["<all_urls>"],
   "action": {

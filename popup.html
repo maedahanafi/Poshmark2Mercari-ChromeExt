@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Listing Selector</title>
+  <title>Poshmark to Mercari Autofill</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
@@ -316,20 +316,20 @@
     <div class="brand">
       <div class="brand-icon">🎯</div>
       <div>
-        <div class="brand-name">Listing Selector</div>
-        <div class="brand-sub">Click anything. Save everything.</div>
+        <div class="brand-name">Poshmark to Mercari Autofill</div>
+        <div class="brand-sub">Import Individual Listings to Sell on Mercari.</div>
       </div>
     </div>
-    <div class="status-row">
+    <!--<div class="status-row">
       <div class="status-dot" id="status-dot"></div>
       <span class="status-text" id="status-text">Selection mode off</span>
-    </div>
+    </div>-->
   </div>
 
   <div class="scraped-data-section">
     <div class="scraped-data-row">
       <div class="scraped-data-label">Scraped Data </div>
-      <div class="scraped-data-desc">Navigate to Individual Poshmark Listing</div>
+      <div class="scraped-data-desc">Double Check the Imported Data</div>
     </div>
     <div class="scraped-data-row">
       <pre id="scraped-data-output"></pre>
@@ -339,7 +339,7 @@
     </button>
   </div>
 
-  <div class="toggle-section">
+  <!--<div class="toggle-section">
     <div class="toggle-row">
       <div>
         <div class="toggle-label">Selection Mode</div>
@@ -361,25 +361,24 @@
       <div class="stat-num zero" id="stat-page">—</div>
       <div class="stat-label">Page</div>
     </div>
-  </div>
+  </div>-->
 
-  <div class="btn-group">
+  <!--<div class="btn-group">
     <button class="btn btn-primary" id="btn-view" disabled>
       <span>👁</span> View Selected Listings
     </button>
     <div style="display:flex;gap:8px">
-      <!--<button class="btn btn-secondary" id="btn-scan" style="flex:1">
+      <button class="btn btn-secondary" id="btn-scan" style="flex:1">
         <span>🔍</span> Auto-Detect
-      </button>-->
+      </button>
       <button class="btn btn-danger" id="btn-clear" style="flex:1" disabled>
         <span>✕</span> Clear
       </button>
     </div>
-  </div>
+  </div>-->
 
   <div class="tip" id="tip-text">
-    <strong>How to use:</strong> Toggle Selection Mode, then click any listing cards on the page to select them.
-  </div>
+    <strong>How to use:</strong> Click on the button on the bottom corner of your Poshmark listing page. A Mercari selling page will popup with all the data autofilled. Refresh your page if you don't see the button on the bottom.
 
   <script src="popup.js"></script>
 </body>

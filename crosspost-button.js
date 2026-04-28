@@ -2,16 +2,21 @@
 // Injects a floating crosspost button on Poshmark listing detail pages.
 // When clicked, scrapes the listing and opens Mercari's sell form pre-filled.
 
-(function () {
+async function init() {
   if (window.__crosspostInit) return;
   window.__crosspostInit = true;
 
   // ─── Only run on individual listing pages ───
-  const isListingPage = () =>
-    /poshmark\.com\/listing\//.test(location.href) ||
-    /poshmark\.com\/closet\/.+/.test(location.href);
+  const isListingPage = async () => {
+    const response = await chrome.runtime.sendMessage({ type: 'GET_TAB_URL' });
+    const actualUrl = response.url;
+    console.log('Checking URL for listing page:', actualUrl);
+    return /poshmark\.com\/listing\//.test(actualUrl) ||
+      /poshmark\.com\/closet\/.+/.test(actualUrl)
+  };
 
-  if (!isListingPage()) return;
+  const isPageAListing = await isListingPage();
+  if (!isPageAListing) return;
 
   // ─── Inject styles ───
   const style = document.createElement('style');
@@ -493,4 +498,6 @@
     return true;
   });
 
-})();
+};
+
+init();
