@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Poshmark to Mercari Autofill",
   "version": "1.0.0",
-  "description": "Navigate to your Poshmark listing on a page and in a click of a button, import them into Mercari's selling form with all details and photos pre-filled.",
+  "description": "Navigate to your Poshmark listing. With a click, all details and photos pre-filled are imported into Mercari.",
   "permissions": ["activeTab", "scripting", "storage"],
   "host_permissions": ["<all_urls>"],
   "action": {

@@ -23,3 +23,12 @@ Navigate to your Poshmark listing on a page and in a click of a button, import t
 ### Image Issues?
 - If the images do not upload, you must upload them from Poshmark manually.
 
+## Dev Notes
+
+For publishing: 
+
+```
+cd Poshmark2Mercari-ChromeExt
+zip -r ../Poshmark2Mercari-ChromeEx .
+
+```
