@@ -431,6 +431,7 @@
   async function handleCrosspost(platform) {
     showToast('⚡', 'Scraping listing…');
     const listing = await scrapeListing();
+    await cacheImages(listing.images);
     await chrome.storage.local.set({ pendingListing: listing });
 
     // Collapse FAB
