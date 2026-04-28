@@ -80,10 +80,11 @@
     }
 
     // 3. PRICE  (Mercari has no buyer fee shown to seller — suggest ~10% lower)
-    const priceInput = document.querySelector('input[data-testid="ItemPrice"]') ||
-                       findByPlaceholder('input', 'Price') ||
-                       findByLabel('Price') ||
-                       document.querySelector('input[name="price"]');
+    const priceInput = //document.querySelector('input[data-testid="ItemPrice"]') ||
+                       //findByPlaceholder('input', 'Price') ||
+                       //findByLabel('Price') ||
+                       //document.querySelector('input[name="price"]');
+                       document.querySelector("input[id='Price']");
     if (priceInput && listing.price) {
       const suggested = Math.max(1, Math.floor(listing.price * 0.9));
       fill(priceInput, String(suggested));
@@ -115,6 +116,9 @@
       fillCategory(listing.category);
       await sleep(120);
     }
+
+    // 8. IMAGES
+    await uploadImages();   // ← add at the end
 
     updatePanelStatus('filled');
   }
@@ -307,6 +311,68 @@
       }
     }
     return null;
+  }
+  // ─────────────────────────────────────────────
+  // Upload Images (handles both file input and drag-and-drop zones)
+  // ─────────────────────────────────────────────
+  
+  async function uploadImages() {
+    const { pendingImages } = await chrome.storage.local.get(['pendingImages']);
+    if (!pendingImages?.length) return;
+
+    // Wait for Mercari's upload zone to appear
+    const dropZone = await waitForEl(
+      '[data-testid="ImageUploader"], [class*="photo-upload"], [class*="image-upload"], input[type="file"][accept*="image"]'
+    );
+
+    if (!dropZone) {
+      showToast('⚠️', 'Could not find image upload area.');
+      return;
+    }
+
+    // Convert base64 strings back to File objects
+    const files = pendingImages.map((img, i) => {
+      const binary = atob(img.base64.split(',')[1]);
+      const bytes  = new Uint8Array(binary.length);
+      for (let j = 0; j < binary.length; j++) bytes[j] = binary.charCodeAt(j);
+      const blob = new Blob([bytes], { type: img.type });
+      return new File([blob], `photo-${i + 1}.jpg`, { type: img.type });
+    });
+
+    // If it's a plain file input, set files directly
+    if (dropZone.tagName === 'INPUT') {
+      const dt = new DataTransfer();
+      files.forEach(f => dt.items.add(f));
+      dropZone.files = dt.files;
+      dropZone.dispatchEvent(new Event('change', { bubbles: true }));
+      return;
+    }
+
+    // Otherwise simulate a drop event on the upload zone
+    const dt = new DataTransfer();
+    files.forEach(f => dt.items.add(f));
+
+    dropZone.dispatchEvent(new DragEvent('dragenter', { bubbles: true, dataTransfer: dt }));
+    dropZone.dispatchEvent(new DragEvent('dragover',  { bubbles: true, dataTransfer: dt }));
+    dropZone.dispatchEvent(new DragEvent('drop',      { bubbles: true, dataTransfer: dt }));
+
+    await chrome.storage.local.remove('pendingImages');
+  }
+
+  // Helper — poll for an element to appear
+  function waitForEl(selector, timeout = 10000) {
+    return new Promise(resolve => {
+      const el = document.querySelector(selector);
+      if (el) return resolve(el);
+
+      const observer = new MutationObserver(() => {
+        const el = document.querySelector(selector);
+        if (el) { observer.disconnect(); resolve(el); }
+      });
+
+      observer.observe(document.body, { childList: true, subtree: true });
+      setTimeout(() => { observer.disconnect(); resolve(null); }, timeout);
+    });
   }
 
   // ─────────────────────────────────────────────
@@ -597,6 +663,10 @@
           <div class="mf-step-icon">✦</div>
           <div class="mf-step-text">Category</div>
         </div>
+        <div class="mf-step" id="mf-step-images">
+          <div class="mf-step-icon">✦</div>
+          <div class="mf-step-text">Images</div>
+        </div>
       </div>
 
       <div id="mf-footer">
@@ -641,7 +711,7 @@
   }
 
   async function animateSteps(listing) {
-    const steps = ['title', 'desc', 'price', 'condition', 'details', 'category'];
+    const steps = ['title', 'desc', 'price', 'condition', 'details', 'category', 'images'];
     const bar = document.getElementById('mf-progress-bar');
 
     for (let i = 0; i < steps.length; i++) {

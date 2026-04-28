@@ -383,6 +383,32 @@
     return { id, title, description, price, size, brand, condition, color, category, images, url: location.href, source: 'poshmark' };
   }
 
+  async function cacheImages(imageUrls) {
+    const cached = [];
+
+    for (const url of imageUrls.slice(0, 12)) {
+      try {
+        const res = await fetch(url);
+        const blob = await res.blob();
+        const base64 = await blobToBase64(blob);
+        cached.push({ url, base64, type: blob.type });
+      } catch (e) {
+        console.warn('Failed to fetch image:', url);
+      }
+    }
+
+    await chrome.storage.local.set({ pendingImages: cached });
+  }
+
+  function blobToBase64(blob) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result); // "data:image/jpeg;base64,..."
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }
+
   // Scan structured detail rows (Poshmark uses key-value pairs in the listing sidebar)
   function extractDetail(keywords) {
     const rows = document.querySelectorAll(
