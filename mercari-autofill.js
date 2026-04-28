@@ -96,12 +96,8 @@
 
     // 5. BRAND
     await sleep(200);
-    const brandInput = findByPlaceholder('input', 'Brand') ||
-                       findByLabel('Brand') ||
-                       document.querySelector('input[data-testid="ItemBrand"]') ||
-                       document.querySelector('input[name="brand"]');
-    if (brandInput && listing.brand) {
-      fill(brandInput, listing.brand);
+    if (listing.brand) {
+      fillBrand(listing.brand);
       await sleep(120);
     }
 
@@ -111,6 +107,12 @@
                       document.querySelector('input[data-testid="ItemSize"]');
     if (sizeInput && listing.size) {
       fill(sizeInput, listing.size);
+      await sleep(120);
+    }
+
+    // 7. CATEGORY
+    if (listing.category) {
+      fillCategory(listing.category);
       await sleep(120);
     }
 
@@ -137,7 +139,7 @@
     }
 
     lines.push('');
-    lines.push('Cross-listed from Poshmark.');
+    //lines.push('Cross-listed from Poshmark.');
 
     return lines.join('\n');
   }
@@ -156,8 +158,13 @@
 
     // Mercari renders condition as clickable buttons/labels
     const candidates = [
-      ...document.querySelectorAll('button, label, [role="radio"], [role="button"]')
+      ...document.querySelectorAll(
+        //'button, label, [role="radio"], [role="button"]'
+        'label[class*="ConditionField"], input[name="sellCondition"]'
+      )
     ];
+
+    console.log('Filling condition:', { rawCondition, normalized, mercariLabel, candidates });
 
     for (const el of candidates) {
       const text = el.textContent?.trim();
@@ -165,18 +172,87 @@
 
       if (
         text === mercariLabel ||
-        (mercariLabel === 'New' && (text === 'New' || text === 'New with tags')) ||
-        (mercariLabel === 'Like New' && (text === 'Like new' || text === 'Like New')) ||
-        (mercariLabel === 'Good' && text === 'Good') ||
-        (mercariLabel === 'Fair' && (text === 'Fair' || text === 'Poor'))
+        (mercariLabel === 'New' && text.toLowerCase().includes('new with tags')) ||
+        (mercariLabel === 'Like New' && text.toLowerCase().includes('like new')) ||
+        (mercariLabel === 'Good' && text.toLowerCase().includes('good')) ||
+        (mercariLabel === 'Fair' && (text.toLowerCase().includes('fair') || text.toLowerCase().includes('poor')))
       ) {
         el.click();
-        el.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
-        el.dispatchEvent(new MouseEvent('mouseup',   { bubbles: true }));
+        //el.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+        //el.dispatchEvent(new MouseEvent('mouseup',   { bubbles: true }));
         break;
       }
     }
   }
+
+  // ─────────────────────────────────────────────
+  // Brand FILL
+  // ─────────────────────────────────────────────
+  async function fillBrand(brand) { // e.g. "Free People" 
+    const brandInput = //findByPlaceholder('input', 'Brand') ||
+                       //findByLabel('Brand') ||
+                       //document.querySelector('input[data-testid="ItemBrand"]') ||
+                       //document.querySelector('input[name="brand"]');
+                       document.querySelector('input[id="sellBrandId"]');
+                       //document.getElementById("sellBrandId");
+                       //document.querySelector('div[id="sellBrandId"] div[class*="SelectWrapper"]');
+    brandInput.value = brand; // Sets the value and fires events
+    
+  }
+
+  // ─────────────────────────────────────────────
+  // Category FILL
+  // ─────────────────────────────────────────────
+  async function fillCategory(rawCategory) { // e.g. "Women > Bags"
+    if (!rawCategory) return;
+    const categoryParts = rawCategory.split(' > ').map(s => s.trim());
+
+    let index = 0;
+    let categoryInputCandidates = document.querySelectorAll('div[data-testid*="CategoryL"]');
+    while (index < categoryParts.length) {
+      const currentCategoryPart = categoryParts[index].toLowerCase();
+
+      /*categoryInputCandidates[0].click(); // Opens dropdown
+      await sleep(1000); // Wait for options to render
+
+      const availableOptions = document.querySelectorAll('li[data-testid*="CategoryL"]');
+      if (!availableOptions) break;
+
+      // Find the option that best matches the current category part, e.g. "bags" should match "Women's Handbags"
+      const selectedOption = Array.from(availableOptions).find(option => option.innerText?.toLowerCase().includes(currentCategoryPart));
+      if (selectedOption) {
+        selectedOption.click(); // Selects category and moves to next level
+        await sleep(1000); // Wait for next category (if available) to render
+        
+        categoryInputCandidates = document.querySelectorAll('div[data-testid*="CategoryL"]'); // Update candidates for next level
+      }*/
+     fillDropDown (
+        'div[data-testid*="CategoryL'+ index +'"]', 
+        'li[data-testid*="CategoryL"]', 
+        currentCategoryPart
+      )
+      await sleep(1000); // Wait for next category (if available) to render
+
+     categoryInputCandidates = document.querySelectorAll('div[data-testid*="CategoryL"]'); // Update candidates for next level
+      index = index + 1;
+    }
+    
+  }
+
+  async function fillDropDown (dropdownSelector, optionsSelector, partialText) {
+      let dropdownCandidates = document.querySelectorAll(dropdownSelector);
+      if (!dropdownCandidates || dropdownCandidates.length === 0) return;
+      dropdownCandidates[0].click(); // Opens dropdown
+      await sleep(1000); // Wait for options to render
+
+      const availableOptions = document.querySelectorAll(optionsSelector);  
+      if (!availableOptions) return;
+      const selectedOption = Array.from(availableOptions)
+        .find(option => option.innerText?.toLowerCase().includes(partialText.toLowerCase()));
+      if (selectedOption) {
+        selectedOption.click(); // Selects option
+      }  
+    }
 
   // ─────────────────────────────────────────────
   // REACT-SAFE INPUT SETTER
@@ -195,6 +271,7 @@
     } else {
       el.value = value;
     }
+    console.log('Filling', el, 'with value:', value, 'using native setter:', proto);
 
     // Fire events React listens to
     ['input', 'change', 'blur'].forEach(type => {
@@ -210,6 +287,12 @@
   function findByPlaceholder(tag, partial) {
     return [...document.querySelectorAll(tag)].find(
       el => el.placeholder?.toLowerCase().includes(partial.toLowerCase())
+    ) || null;
+  }
+
+  function findById(tag, id) {
+    return [...document.querySelectorAll(tag)].find(
+      el => el.id === id
     ) || null;
   }
 
@@ -510,6 +593,10 @@
           <div class="mf-step-icon">✦</div>
           <div class="mf-step-text">Brand / Size</div>
         </div>
+        <div class="mf-step" id="mf-step-category">
+          <div class="mf-step-icon">✦</div>
+          <div class="mf-step-text">Category</div>
+        </div>
       </div>
 
       <div id="mf-footer">
@@ -554,7 +641,7 @@
   }
 
   async function animateSteps(listing) {
-    const steps = ['title', 'desc', 'price', 'condition', 'details'];
+    const steps = ['title', 'desc', 'price', 'condition', 'details', 'category'];
     const bar = document.getElementById('mf-progress-bar');
 
     for (let i = 0; i < steps.length; i++) {

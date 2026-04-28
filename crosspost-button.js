@@ -312,35 +312,43 @@
   async function scrapeListing() {
     fab.classList.add('loading');
 
+    const listingInfo = document.querySelector('div[class*="listing__info"]');
+
     // Title
     const title =
-      document.querySelector('h1[itemprop="name"]')?.textContent?.trim() ||
-      document.querySelector('.listing__title h1')?.textContent?.trim() ||
-      document.querySelector('[class*="listing-title"] h1')?.textContent?.trim() ||
-      document.querySelector('h1')?.textContent?.trim() || '';
+      //document.querySelector('h1[itemprop="name"]')?.textContent?.trim() ||
+      //document.querySelector('.listing__title h1')?.textContent?.trim() ||
+      //document.querySelector('[class*="listing-title"] h1')?.textContent?.trim() ||
+      //document.querySelector('h1')?.textContent?.trim() || 
+      listingInfo.querySelector('h1[class*="listing__title"]')?.textContent?.trim() || '';
 
     // Description
     const description =
-      document.querySelector('[itemprop="description"]')?.textContent?.trim() ||
-      document.querySelector('[class*="description__text"]')?.textContent?.trim() ||
-      document.querySelector('[data-test="listing-description"]')?.textContent?.trim() ||
-      document.querySelector('[class*="listing-description"]')?.textContent?.trim() || '';
+      //document.querySelector('[itemprop="description"]')?.textContent?.trim() ||
+      //document.querySelector('[class*="description__text"]')?.textContent?.trim() ||
+      //document.querySelector('[data-test="listing-description"]')?.textContent?.trim() ||
+      //document.querySelector('[class*="listing-description"]')?.textContent?.trim() || 
+      listingInfo.querySelector('[class*="listing__description"]')?.textContent?.trim() || '';
 
     // Price
     const priceEl =
-      document.querySelector('[itemprop="price"]') ||
-      document.querySelector('[class*="listing-price"]') ||
-      document.querySelector('[data-test="listing-price"]');
+      //document.querySelector('[itemprop="price"]') ||
+      //document.querySelector('[class*="listing-price"]') ||
+      //document.querySelector('[data-test="listing-price"]') ||
+      listingInfo.querySelector('div[class*="listing__ipad-centered"]');
     const priceText = priceEl?.getAttribute('content') || priceEl?.textContent || '';
-    const price = parseFloat((priceText.match(/[\d.]+/) || [])[0] || '0');
+    const priceNums = priceText.replaceAll("$", "").match(/[\d,.]+/g);
+    const price = parseFloat((priceNums && priceNums.length > 0 ? priceNums[0] : '') || '0');
+    console.log('Extracted price text:', priceText, priceNums, price);
 
     // Size
     const size = extractDetail(['size', 'sz']) ||
       document.querySelector('[class*="size-tag"]')?.textContent?.trim() || '';
 
-    // Brand
+    // Brand 
     const brand = extractDetail(['brand']) ||
-      document.querySelector('[class*="brand"] a')?.textContent?.trim() || '';
+      //document.querySelector('[class*="brand"] a')?.textContent?.trim() || 
+      listingInfo.querySelector('a[class*="listing__brand"]')?.textContent?.trim() || '';
 
     // Condition
     const condition = extractDetail(['condition', 'nwt', 'nwot', 'used', 'like new']) ||
@@ -351,7 +359,7 @@
 
     // Category breadcrumbs
     const category = Array.from(
-      document.querySelectorAll('[class*="breadcrumb"] a, nav[aria-label*="read"] a')
+      document.querySelectorAll('div[data-et-name="listing_details_category"]')
     ).map(a => a.textContent.trim()).filter(Boolean).join(' > ');
 
     // Images — grab full-res sources
@@ -397,6 +405,7 @@
   async function handleCrosspost(platform) {
     showToast('⚡', 'Scraping listing…');
     const listing = await scrapeListing();
+    await chrome.storage.local.set({ pendingListing: listing });
 
     // Collapse FAB
     wrap.classList.remove('expanded');
@@ -405,7 +414,6 @@
 
     if (platform === 'mercari') {
       console.log('Scraped listing data:', listing);
-      await chrome.storage.local.set({ pendingListing: listing });
       chrome.runtime.sendMessage({ type: 'OPEN_TAB', url: 'https://www.mercari.com/sell/' });
       showToast('🚀', `Opening Mercari…\nYour listing data is ready to fill.`);
 
@@ -438,15 +446,23 @@
   });
 
     // ── LISTEN FOR MESSAGES FROM POPUP ──
-  chrome.runtime.onMessage.addListener((msg, _, sendResponse) => {
+  chrome.runtime.onMessage.addListener(async (msg, _, sendResponse) => {
+    
     if (msg.type === 'CP_PENDING_LISTING') {
       chrome.storage.local.get(['pendingListing'], ({ pendingListing }) => {
         console.log('Retrieved pending listing from storage:', pendingListing);
         if (!pendingListing) return; // nothing to fill
         sendResponse({ pendingListing });
       });
-      
     }
+
+    if (msg.type === 'CP_SCRAPE_LISTING') {
+      showToast('⚡', 'Scraping listing…');
+      const listing = await scrapeListing();
+      await chrome.storage.local.set({ pendingListing: listing });
+      sendResponse({ pendingListing: listing });
+    }
+
     return true;
   });
 

@@ -97,9 +97,9 @@ async function setPageStat() {
 
 // ── EVENT HANDLERS ──
 
-document.getElementById('btn-refresh').addEventListener('click', async () =>  {
-  // Retrieve pending listing data if coming from content script after scraping
-  const res = await sendToContent({ type: 'CP_PENDING_LISTING' });
+document.getElementById('btn-scrape').addEventListener('click', async () =>  {
+  // Scrape the listing data if coming from content script after scraping
+  const res = await sendToContent({ type: 'CP_SCRAPE_LISTING' });
   if (res?.pendingListing) {
     pendingListing = res.pendingListing;
     updateUI();
