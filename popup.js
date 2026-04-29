@@ -21,7 +21,7 @@ async function sendToContent(msg) {
       await sleep(200);
       return await chrome.tabs.sendMessage(tab.id, msg);
     } catch (e2) {
-      console.warn('Could not inject content script:', e2);
+      //console.warn('Could not inject content script:', e2);
       return null;
     }
   }
@@ -48,7 +48,7 @@ function updateUI() {
   const tipText = document.getElementById('tip-text');
 
   if (pendingListing) {
-    console.log('Displaying pending listing data:', pendingListing);
+    //console.log('Displaying pending listing data:', pendingListing);
     pendingListingView.textContent = JSON.stringify(pendingListing, null, 2);
     pendingListingView.parentElement.style.display = 'block';
   }

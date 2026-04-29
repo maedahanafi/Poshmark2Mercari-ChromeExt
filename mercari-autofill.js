@@ -168,7 +168,7 @@
       )
     ];
 
-    console.log('Filling condition:', { rawCondition, normalized, mercariLabel, candidates });
+    //console.log('Filling condition:', { rawCondition, normalized, mercariLabel, candidates });
 
     for (const el of candidates) {
       const text = el.textContent?.trim();
@@ -275,7 +275,7 @@
     } else {
       el.value = value;
     }
-    console.log('Filling', el, 'with value:', value, 'using native setter:', proto);
+    //console.log('Filling', el, 'with value:', value, 'using native setter:', proto);
 
     // Fire events React listens to
     ['input', 'change', 'blur'].forEach(type => {

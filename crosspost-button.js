@@ -10,7 +10,7 @@ async function init() {
   const isListingPage = async () => {
     const response = await chrome.runtime.sendMessage({ type: 'GET_TAB_URL' });
     const actualUrl = response.url;
-    console.log('Checking URL for listing page:', actualUrl);
+    //console.log('Checking URL for listing page:', actualUrl);
     return /poshmark\.com\/listing\//.test(actualUrl) ||
       /poshmark\.com\/closet\/.+/.test(actualUrl)
   };
@@ -344,7 +344,7 @@ async function init() {
     const priceText = priceEl?.getAttribute('content') || priceEl?.textContent || '';
     const priceNums = priceText.replaceAll("$", "").match(/[\d,.]+/g);
     const price = parseFloat((priceNums && priceNums.length > 0 ? priceNums[0] : '') || '0');
-    console.log('Extracted price text:', priceText, priceNums, price);
+    //console.log('Extracted price text:', priceText, priceNums, price);
 
     // Size
     const size = extractDetail(['size', 'sz']) ||
@@ -398,7 +398,7 @@ async function init() {
         const base64 = await blobToBase64(blob);
         cached.push({ url, base64, type: blob.type });
       } catch (e) {
-        console.warn('Failed to fetch image:', url);
+        //console.warn('Failed to fetch image:', url);
       }
     }
 
@@ -445,7 +445,7 @@ async function init() {
     fabIcon.textContent = '⚡';
 
     if (platform === 'mercari') {
-      console.log('Scraped listing data:', listing);
+      //console.log('Scraped listing data:', listing);
       chrome.runtime.sendMessage({ type: 'OPEN_TAB', url: 'https://www.mercari.com/sell/' });
       showToast('🚀', `Opening Mercari…\nYour listing data is ready to fill.`);
 
@@ -482,7 +482,7 @@ async function init() {
     
     if (msg.type === 'CP_PENDING_LISTING') {
       chrome.storage.local.get(['pendingListing'], ({ pendingListing }) => {
-        console.log('Retrieved pending listing from storage:', pendingListing);
+        //console.log('Retrieved pending listing from storage:', pendingListing);
         if (!pendingListing) return; // nothing to fill
         sendResponse({ pendingListing });
       });

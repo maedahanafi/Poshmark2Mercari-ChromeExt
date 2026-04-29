@@ -29,6 +29,5 @@ For publishing:
 
 ```
 cd Poshmark2Mercari-ChromeExt
-zip -r ../Poshmark2Mercari-ChromeEx .
-
+zip -r ../Poshmark2Mercari-ChromeEx.zip . --exclude "*.git*" --exclude "*.DS_Store*" --exclude "*node_modules*" --exclude "*.zip"
 ```
